@@ -10,9 +10,6 @@
 
     <title>DHL Challenge</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Custom fonts for this template -->
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
@@ -25,9 +22,94 @@
     <!-- Custom styles for this template -->
     <link href="css/creative.min.css" rel="stylesheet">
 
+    <!-- WorldMap -->
+    <script src="https://www.amcharts.com/lib/3/ammap.js"></script>
+    <script src="https://www.amcharts.com/lib/3/maps/js/worldLow.js"></script>
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <!-- WorldMap StyleSheet-->
+    <link rel="stylesheet" href="css/worldMap.css" type="text/css" media="all" />
+    <!-- WorldMap js-->
+    <script src="js/worldMap.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js"></script>
+
+    <!-- FreeWall -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/freewall.js"></script>
+
+    <!-- Overlay -->
+    <script type="text/javascript" src="js/overlay.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jquery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- FreeWall -->
+    <script type="text/javascript" src="js/freewall.js"></script>
+
 </head>
 
 <body id="page-top">
+<script>
+    var users = [];
+    var link;
+    var counter = 2;
+    var counterlenght;
+    var config = {
+        apiKey: 'AIzaSyDk0Y3cdJEhsogE1EIuXdzew5ZnID25rHU',
+        authDomain: 'digitalhumanlife-d6f0a.firebaseapp.com',
+        databaseURL: 'https://digitalhumanlife-d6f0a.firebaseio.com',
+        projectId: 'digitalhumanlife-d6f0a',
+        storageBucket: 'digitalhumanlife-d6f0a.appspot.com',
+        messagingSenderId: '608846438689'
+    };
+    firebase.initializeApp(config);
+
+
+    var database = firebase.database().ref('users');
+    users = [];
+    database.once('value', function(snapshot) {
+
+        snapshot.forEach(function(userSnapshot) {
+
+            const first_name = userSnapshot.child('first_name').val();
+            const last_name = userSnapshot.child('last_name').val();
+            const score = userSnapshot.child('score').val();
+            const city = userSnapshot.child('city').val()
+            const id = userSnapshot.key;
+            const link = userSnapshot.child('selfie_preview').val();
+            const user = {id: id, first_name: first_name, last_name: last_name, link: link, city: city};
+            users.push(user);
+
+            users.sort(function(a, b){
+                return b.score - a.score;
+            });
+        });
+        users = users.filter(function(val){
+            return val.city === 'Munich';
+        });
+        console.log(users);
+        var myuser = users[0];
+        link = myuser.link;
+        counterlenght = link.length;
+        $("#pic1").attr("src",link[0]);
+        $("#pic2").attr("src",link[1]);
+    });
+
+
+</script>
+
+
+
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
@@ -80,20 +162,102 @@
         </div>
     </header>
 
-    <section class="bg-primary" id="about">
+    <section id="about">
         <div class="container">
             <div class="row">
-
                 <div class="col-lg-12 text-center">
-                    <h2 class="section-heading text-white">#WELTKARTE</h2>
+                    <h2 class="section-heading text-black">#WELTKARTE</h2>
                     <hr class="light my-4">
                 </div>
             </div>
             <div class="row">
+                <div id="chartdiv"></div>
+                <div id="overlay" onclick="off()">
+                    <div class="row" >
+                        <div class="col-lg-2">
+                            <div class="brick size11 add-more">
+                                <div class='cover'>
+                                    <h2>Prepend</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+
+                            <div id="freewall" class="free-wall">
+
+                                <div class="brick size32">
+                                    <div class='cover'>
+                                        <img id="pic1">
+                                    </div>
+                                </div>
+                                <div class="brick size21" data-fixSize=0>
+                                    <div class='cover'>
+                                        <img id="pic2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script type="text/javascript">
+
+                            var colour = [
+                                "rgb(216, 205, 205)",
+                                // "rgb(243, 156, 18)",
+                                // "rgb(211, 84, 0)",
+                                // "rgb(0, 106, 63)",
+                                // "rgb(41, 128, 185)",
+                                // "rgb(192, 57, 43)",
+                                // "rgb(135, 0, 0)",
+                                // "rgb(39, 174, 96)"
+                            ];
+
+                            $(".brick").each(function() {
+                                this.style.backgroundColor =  colour[colour.length * Math.random() << 0];
+                                //$(".brick").append('<img src="https://images.fcbayern.com/is/image/fcbayern/product-gallery-small/weihnachtsfiguren-2er-set-20972.jpg?wid=660&hei=660&fmt=png-alpha" alt="">');
+                            });
+
+                            $(function() {
+                                var wall = new Freewall("#freewall");
+                                wall.reset({
+                                    selector: '.brick',
+                                    animate: true,
+                                    cellW: 260,
+                                    cellH: 160,
+                                    delay: 50,
+                                    onResize: function() {
+                                        wall.fitWidth();
+                                    }
+                                });
+                                wall.fitWidth();
+
+                                console.log(link);
+                                var temp = '<div class="brick {size}" style="background-color: {color}"><img id="picture" src="{link}"></div>';
+                                var size = "size33 size32 size31 size23 size22 size21 size13 size12 size11".split(" ");
+                                $(".add-more").click(function() {
+                                    var html = "";
+                                    for (var i = 0; i < 3; ++i) {
+                                        html += temp.replace('{size}', size[size.length * Math.random() << 0])
+                                            .replace('{color}', colour[colour.length * Math.random() << 0])
+                                            .replace('{link}',link[counter]);
+                                        if(counterlenght == counter){
+                                            $(".add-more").removeAttribute(".add-more");
+                                        }
+                                        counter++;
+                                    }
+                                    wall.prepend(html);
+                                });
+                            });
+
+                        </script>
+
+                        <div class="col-lg-2 off" onclick="off()">Close</div>
+                    </div>
+                </div>
             </div>
             <!--<a class="btn btn-light btn-xl js-scroll-trigger" href="#services">What I do?</a>-->
         </div>
     </section>
+
 
     <section id="services">
         <div class="container">
