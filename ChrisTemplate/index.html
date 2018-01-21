@@ -79,31 +79,59 @@
     users = [];
     database.once('value', function(snapshot) {
 
-        snapshot.forEach(function(userSnapshot) {
+        snapshot.forEach(function (userSnapshot) {
 
             const first_name = userSnapshot.child('first_name').val();
             const last_name = userSnapshot.child('last_name').val();
             const score = userSnapshot.child('score').val();
-            const city = userSnapshot.child('city').val()
             const id = userSnapshot.key;
-            const link = userSnapshot.child('selfie_preview').val();
-            const user = {id: id, first_name: first_name, last_name: last_name, link: link, city: city};
-            users.push(user);
+            const country = userSnapshot.child('country').val();
+            const city = userSnapshot.child('city').val();
+            const selfie_preview = userSnapshot.child('selfie_preview').val();
 
-            users.sort(function(a, b){
-                return b.score - a.score;
-            });
+            //console.log(selfie_preview);
+
+            for (const selfie in selfie_preview) {
+                //console.log(selfie_preview[selfie]);
+                const user = {
+                    id: id,
+                    first_name: first_name,
+                    last_name: last_name,
+                    city: city,
+                    score: score,
+                    selfie_preview: selfie_preview[selfie]
+                };
+
+                users.push(user);
+
+                users = users.filter(function (val) {
+                    return val.city === 'Munich';
+                });
+
+                users.sort(function (a, b) {
+                    return b.score - a.score;
+                });
+
+                $('#bestOf tr').not(':first').remove();
+                var html = '';
+                for (var i = 0; i < users.length; i++)
+                    html += '<tr><td>' + i + '</td><td>' + users[i].first_name + '</td><td>' + users[i].score + users[i].selfie_preview + '</td></tr>';
+                $('#bestOf tr').first().after(html);
+            }
         });
-        users = users.filter(function(val){
-            return val.city === 'Munich';
-        });
-        console.log(users);
-        var myuser = users[0];
-        link = myuser.link;
-        counterlenght = link.length;
-        $("#pic1").attr("src",link[0]);
-        $("#pic2").attr("src",link[1]);
+        console.log(users[10]["selfie_preview"]);
+        counterlenght = users.length;
+        $("#pic1").attr("src",users[0]["selfie_preview"]);
+        $("#pic2").attr("src",users[1]["selfie_preview"]);
+
     });
+
+
+
+
+
+
+
 
 
 </script>
@@ -172,7 +200,7 @@
             </div>
             <div class="row">
                 <div id="chartdiv"></div>
-                <div id="overlay" onclick="off()">
+                <div id="overlay">
                     <div class="row" >
                         <div class="col-lg-2">
                             <div class="brick size11 add-more">
@@ -221,8 +249,8 @@
                                 wall.reset({
                                     selector: '.brick',
                                     animate: true,
-                                    cellW: 260,
-                                    cellH: 160,
+                                    cellW: 160,
+                                    cellH: 100,
                                     delay: 50,
                                     onResize: function() {
                                         wall.fitWidth();
@@ -230,7 +258,7 @@
                                 });
                                 wall.fitWidth();
 
-                                console.log(link);
+                                //console.log(link);
                                 var temp = '<div class="brick {size}" style="background-color: {color}"><img id="picture" src="{link}"></div>';
                                 var size = "size33 size32 size31 size23 size22 size21 size13 size12 size11".split(" ");
                                 $(".add-more").click(function() {
@@ -238,7 +266,7 @@
                                     for (var i = 0; i < 3; ++i) {
                                         html += temp.replace('{size}', size[size.length * Math.random() << 0])
                                             .replace('{color}', colour[colour.length * Math.random() << 0])
-                                            .replace('{link}',link[counter]);
+                                            .replace('{link}',users[counter]["selfie_preview"]);
                                         if(counterlenght == counter){
                                             $(".add-more").removeAttribute(".add-more");
                                         }
