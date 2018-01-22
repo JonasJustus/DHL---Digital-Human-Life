@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>DHL Challenge</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+
+    <!-- Plugin CSS -->
+    <link href="vendor/flag-icon/css/flag-icon.min.css" rel="stylesheet">
+    <link href="vendor/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/creative.min.css" rel="stylesheet">
+
+    <!-- WorldMap -->
+    <script src="https://www.amcharts.com/lib/3/ammap.js"></script>
+    <script src="https://www.amcharts.com/lib/3/maps/js/worldLow.js"></script>
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <!-- WorldMap StyleSheet-->
+    <link rel="stylesheet" href="css/worldMap.css" type="text/css" media="all" />
+    <!-- WorldMap js-->
+    <script src="js/worldMap.js"></script>
+
+    <!-- FreeWall -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+    <!-- Overlay -->
+    <script type="text/javascript" src="js/overlay.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jquery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- Firebase JS -->
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js"></script>
+
+    <!-- For filling the highscore table -->
+
+
+
+</head>
+
+<body id="page-top">
+    <script>
+        var users = [];
+        var link;
+        var counter = 0;
+        var counterlenght;
+        var config = {
+            apiKey: 'AIzaSyDk0Y3cdJEhsogE1EIuXdzew5ZnID25rHU',
+            authDomain: 'digitalhumanlife-d6f0a.firebaseapp.com',
+            databaseURL: 'https://digitalhumanlife-d6f0a.firebaseio.com',
+            projectId: 'digitalhumanlife-d6f0a',
+            storageBucket: 'digitalhumanlife-d6f0a.appspot.com',
+            messagingSenderId: '608846438689'
+        };
+        firebase.initializeApp(config);
+
+
+        var database = firebase.database().ref('users1');
+        users1 = [];
+        database.once('value', function(snapshot) {
+
+            snapshot.forEach(function(userSnapshot) {
+
+                const first_name = userSnapshot.child('first_name').val();
+                const last_name = userSnapshot.child('last_name').val();
+                const score = userSnapshot.child('score').val();
+                const id = userSnapshot.key;
+                const country = userSnapshot.child('country').val();
+                const city = userSnapshot.child('city').val();
+                const selfie_preview = userSnapshot.child('selfie_preview').val();
+
+                //console.log(selfie_preview);
+
+                for (const selfie in selfie_preview) {
+                    //console.log(selfie_preview[selfie]);
+                    const user1 = {
+                        id: id,
+                        first_name: first_name,
+                        last_name: last_name,
+                        city: city,
+                        score: score,
+                        selfie_preview: selfie_preview[selfie]
+                    };
+
+                    users1.push(user1);
+
+                    users1 = users1.filter(function(val) {
+                        return val.city === 'Munich';
+                    });
+
+                    users1.sort(function(a, b) {
+                        return b.score - a.score;
+                    });
+
+                    $('#bestOf tr').not(':first').remove();
+                    var html = '';
+                    for (var i = 0; i < users1.length; i++)
+                        html += '<tr><td>' + i + '</td><td>' + users1[i].first_name + '</td><td>' + users1[i].score + users1[i].selfie_preview + '</td></tr>';
+                    $('#bestOf tr').first().after(html);
+                }
+            });
+            counterlenght = users1.length;
+            $(".picOverlayText").add("bla");
+            $(".more").click(function() {
+                console.log(users1);
+                $(".addItem").before("<div id='data' class=\"row align-middle \" >" +
+                    "                                <div class=\"col-6 con\">" +
+                    "                                    <img src=\" " + users1[counter]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                                <div class=\"col-6 con\">" +
+                    "                                    <img src=\" " + users1[counter + 1]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter + 1]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                            </div>");
+                $(".addItem").before("<div id='data' class=\"row align-middle \" >" +
+                    "                                <div class=\"col-lg-6 con\">" +
+                    "                                    <img src=\" " + users1[counter + 2]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter + 2]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                                <div class=\"col-lg-6 con\">" +
+                    "                                    <img src=\" " + users1[counter + 3]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter + 3]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                            </div>");
+                $(".addItem").before("<div id='data' class=\"row align-middle \" >" +
+                    "                                <div class=\"col-lg-6 con\">" +
+                    "                                    <img src=\" " + users1[counter + 4]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter + 4]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                                <div class=\"col-lg-6 con\">" +
+                    "                                    <img src=\" " + users1[counter + 5]["selfie_preview"] + "\" height='300px' width='300px'>" +
+                    "                                    <div class=\"picOverlay\"><div class=\"picOverlayText\">" + users1[counter + 5]["first_name"] + "</div></div>" +
+                    "                                </div>" +
+                    "                            </div>");
+
+                console.log(counter);
+                counter = counter + 6;
+                window.setInterval(function() {
+                    var elem = document.getElementById('data');
+                    elem.scrollTop = elem.scrollHeight;
+                }, 5000);
+            });
+
+        });
+    </script>
+    <script src="js/database.js"></script>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand js-scroll-trigger" href="#page-top"><img class="img-logo" src="img/logo.png" alt="logo"></a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="#about"><strong>#WORLDMAP</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="#services">#CHALLENGE</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="#portfolio">#MIASANMIA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="#">#ACCOUNT</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="masthead text-center d-flex">
+        <div class="container my-auto">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <h1 class="text-uppercase">
+                        <strong>FC BAYERN GLOBAL FAMILY</strong>
+                    </h1>
+                    <hr>
+                </div>
+                <div class="col-lg-8 mx-auto help-background">
+                    <p class="mb-5">FC Bayern Munich Fans build a community around the globe connected by DHL. Engage yourself with the FC Bayern Global Family. Share Selfies and Videos. Compete in challenges. Invite Friends. Vote for your favorite player.</p>
+                    <!--<a class="btn btn-primary btn-xl js-scroll-trigger" href="#about">Curious?</a>-->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading text-black">#WORLDMAP</h2>
+                    <hr class="light my-4">
+                </div>
+            </div>
+            <div class="row">
+                <div id="chartdiv"></div>
+                <div id="overlay">
+                    <div class="row">
+                        <div class="col-lg-2" onclick="off()">
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row bg-secondary rounded">
+                                <div class="col-12">
+                                    <h3 class="city">München</h3>
+                                </div>
+                            </div>
+                            <div class="row first">
+                                <div class="col-6 con">
+                                    <img src="https://inmotion.adrivo.com/images/300/uploads/user/fcb/5970bbce63a35_preview.jpg" width="300px" height='300px'>
+                                    <div class="picOverlay">
+                                        <div class="picOverlayText">Tom</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 con">
+                                    <img src="http://fcbhackdays.sebastian-petter.de/images/3.jpg" width="300px" height='300px'>
+                                    <div class="picOverlay">
+                                        <div class="picOverlayText">Tim</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row addItem">
+                                <div class="itemContainer">
+                                    <button class="btn btn-primary pull-right more">more</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2" onclick="off()"></div>
+                    </div>
+                </div>
+            </div>
+            <!--<a class="btn btn-light btn-xl js-scroll-trigger" href="#services">What I do?</a>-->
+        </div>
+    </section>
+
+    <section id="services">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">#CHALLENGE</h2>
+                    <hr class="my-4">
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    <p class="mb-5">Gain Engagement Points (EP) to raise your DHL Score. Beat legends, friends and other members. Win prizes!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters popup-gallery">
+            <div class="col-lg-6 col-sm-8">
+                <div class="imagebox">
+                    <a class="portfolio-box portfolio-item" href="#portfolio-modal-1">
+                    <img class="img-fluid" src="img/parcel-challenge.png" alt="">
+                    <span class="imagebox-desc">#DHL Parcel Challenge</span>
+                    <span class="imagebox-icon"><i class="fa fa-facebook" style="margin-left:20px"></i><i class="fa fa-twitter" style="margin-left:20px"></i></span>
+                    </a>
+                </div>
+                <div class="imagebox">
+                    <a class="portfolio-box portfolio-item" href="#portfolio-modal-2">
+                    <img class="img-fluid" src="img/joursey-challenge.jpg" alt="">
+                    <span class="imagebox-desc">#Joursey Challenge</span>
+                        <span class="imagebox-icon"><i class="fa fa-facebook" style="margin-left:20px"></i><i class="fa fa-twitter" style="margin-left:20px"></i></span>
+                    </a>
+                </div>
+                <div class="imagebox">
+                    <a class="portfolio-box portfolio-item" href="#portfolio-modal-3">
+                    <img class="img-fluid" src="img/match-challenge.jpg" alt="">
+                    <span class="imagebox-desc">#Man of the Match Challenge</span>
+                        <span class="imagebox-icon"><i class="fa fa-facebook" style="margin-left:20px"></i><i class="fa fa-twitter" style="margin-left:20px"></i></span>
+                    </a>
+                </div>
+                <div class="imagebox">
+                    <a class="portfolio-box portfolio-item" href="#portfolio-modal-4">
+                    <img class="img-fluid" src="img/game-day-challenge.jpg" alt="">
+                    <span class="imagebox-desc">#Game Day Challenge</span>
+                        <span class="imagebox-icon"><i class="fa fa-facebook" style="margin-left:20px"></i><i class="fa fa-twitter" style="margin-left:20px"></i></span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-1"></div>
+            <div class="col-lg-4 col-sm-3">
+
+                <ul class="nav nav-tabs" style="margin:10px">
+                    <li class="challenge-tabs active"><a data-toggle="tab" href="#home" style="color: #D40511">Ranking</a></li>
+                    <li class="challenge-tabs"><a data-toggle="tab" href="#menu1" style="color: #D40511">Friends</a></li>
+                    <li class="challenge-tabs"><a data-toggle="tab" href="#menu1" style="color: #D40511">Prizes</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <table id="bestOf" style="margin:20px">
+                            <tr>
+                                <th>Position</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                            </tr>
+                            <tr>
+                                <td>Loading Data</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="menu1" class="tab-pane fade">
+                        <table id="friendsTable">
+                            <tr>
+                                <th>Position</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                            </tr>
+                            <tr>
+                                <td>Loading Data</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="p-0" id="portfolio">
+        <div class="container-fluid p-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h2 class="section-heading">#MIASANMIA</h2>
+                        <hr class="my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                    <video width="320" height="240" controls>
+  <source src="img/BayernSpecial2.mp4" type="video/mp4" class="vr-video">
+</video></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">#DHL VR</h2>
+                    <hr class="my-4">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 text-center">
+                    <img class="vr-image" src="img/vr-dhl.png" alt="">
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img class="vr-image" src="img/daydream.png" alt="">
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <!-- Portfolio Modals -->
+
+    <!-- Portfolio Modal 1 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-1">
+        <div class="portfolio-modal-dialog bg-white">
+            <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="text-secondary text-uppercase mb-0">DHL Parcel Challenge</h2>
+                        <hr class="mb-5">
+                        <img class="img-fluid mb-5" src="img/qr-code.png" alt="">
+                        <p class="challenge-heading">What?</p>
+                        <p>#Gain EPs for every parcel you send with DHL</p>
+                        <p class="challenge-heading">How?</p>
+                        <p>#Print your individual FC Bayern Global Family QR Code</p>
+                        <p>#Stick the QR Code on your parcel</p>
+                        <p>#Recipient scans QR Code</p>
+                        <p class="challenge-heading">Benefit?</p>
+                        <p>#5 EPs for you</p>
+                        <p>#5 EPs for the recipient</p>
+                        <p>+ 5 EP extra for you if recipient joins FC Bayern Global Family</p>
+                        <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
+                Print QR Code</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 2 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-2">
+        <div class="portfolio-modal-dialog bg-white">
+            <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="text-secondary text-uppercase mb-0">Joursey Challenge</h2>
+                        <hr class="mb-5">
+                        <img class="img-fluid mb-5" src="img/joursey-challenge.jpg" alt="">
+                        <p class="challenge-heading">What?</p>
+                        <p>#Journey + Jersey = Joursey</p>
+                        <p class="challenge-heading">How?</p>
+                        <p>#Share a picture of you in your FC Bayern jersey at an extraordinary place</p>
+                        <p>#Vote for the most extraordinary picture of the season</p>
+                        <p class="challenge-heading">Benefit?</p>
+                        <p>#2 EPs for your picture</p>
+                        <p>#1 EP for your vote</p>
+                        <p>+ extra prizes for the most extraordinary picture of the season!</p>
+                        <a class="btn btn-primary btn-lg rounded-pill" href="#" style="margin-right:20px">
+                Upload</a><a class="btn btn-primary btn-lg rounded-pill" href="#" style="margin-left:20px">
+                Vote</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 3 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-3">
+        <div class="portfolio-modal-dialog bg-white">
+            <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="text-secondary text-uppercase mb-0">Man of the Match Challenge</h2>
+                        <hr class="mb-5">
+                        <img class="img-fluid mb-5" src="img/match-challenge.jpg" alt="">
+                        <p class="challenge-heading">What?</p>
+                        <p>#Live vote up your favorite player</p>
+                        <p class="challenge-heading">How?</p>
+                        <p>#Vote for the best player of the recent match</p>
+                        <p>#You have only one vote per game</p>
+                        <p class="challenge-heading">Benefit?</p>
+                        <p>#1 EP for your vote</p>
+                        <p>+ help your player to get the most valuable player of the whole season!</p>
+                        <a class="btn btn-primary btn-lg rounded-pill" href="#">
+                Vote</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 4 -->
+    <div class="portfolio-modal mfp-hide" id="portfolio-modal-4">
+        <div class="portfolio-modal-dialog bg-white">
+            <a class="close-button d-none d-md-block portfolio-modal-dismiss" href="#">
+          <i class="fa fa-3x fa-times"></i>
+        </a>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="text-secondary text-uppercase mb-0">Game Day Challenge</h2>
+                        <hr class="mb-5">
+                        <img class="img-fluid mb-5" src="img/game-day-challenge.jpg" alt="">
+                        <p class="challenge-heading">What?</p>
+                        <p>#Visit the Allianz Arena for a game</p>
+                        <p class="challenge-heading">How?</p>
+                        <p>#Upload 4 pictures and 1 video of your visit</p>
+                        <p class="challenge-heading">Benefit?</p>
+                        <p>#5 EP for your visit and upload</p>
+                        <a class="btn btn-primary btn-lg rounded-pill" href="#">
+                Upload</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="vendor/scrollreveal/scrollreveal.min.js"></script>
+    <script src="vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/creative.min.js"></script>
+    <script>
+        var currentUser = {
+            id: '00000',
+            email: 'fcb@sebastian-petter.de',
+            last_login: '00/00/0000 00:00:00',
+            first_name: 'DigitalHumanLife',
+            last_name: 'DHL',
+            country: 'DE',
+            city: 'Munich',
+            zip: '00000',
+            street: 'NULL',
+            created_at: '00/00/0000 00:00:00',
+            confirmed_at: '00/00/0000 00:00:00',
+            date_of_birth: '00/00/0000',
+            source: 'NULL',
+            selfie_preview: ["https://mytoys.scene7.com/is/image/myToys/ext/2432225-01.jpg?$rtf_mt_prod-main_xl$"],
+            score: 400,
+            friends: ["111111", "111116"]
+        }
+    </script>
+
+</body>
+
+</html>
